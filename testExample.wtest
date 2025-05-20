@@ -1,9 +1,34 @@
-import example.pepita
+import rodados.*
 
-describe "group of tests for pepita" {
+describe "test rodados" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+    const deportes = new Dependencia(empleados = 45)
+    const cultura = new Dependencia(empleados = 31)
+    const cachito = new Corsa(color = "rojo")
+
+    method initialize() {
+        deportes.agregarAFlota(cachito)
+        deportes.agregarAFlota(new Corsa(color="azul"))
+        deportes.agregarAFlota(new Corsa(color="verde"))
+        deportes.agregarAFlota(new Kwid(tieneTanqueAdicional= true))
+        deportes.agregarAFlota(new Especial(capacidad=9, velocidadMaxima =30, peso =78, color ="verde"))
+        cultura.agregarAFlota(cachito)
+    }
+
+  test "deportes tiene peso total 6450" {
+    assert.equals(1300+1300+1300+1350, deportes.pesoTotalFlota())
+  }
+  test "cultura peso total 10700" {
+    assert.equals(0, cultura.pesoTotalFlota())
   }
 
+  test "la flota de deportes esta bien equipada" {
+    assert.that(deportes.estaBienEquipada())
+  }
+  test "la flota de cultura no esta bien equipada" {
+    assert.notThat(cultura.estaBienEquipada())
+  }
+  test "la capacidad total en color azul de deportes" {
+    assert.equals(7, deportes.capacidadTotalEnColor("azul"))
+  }
 }
