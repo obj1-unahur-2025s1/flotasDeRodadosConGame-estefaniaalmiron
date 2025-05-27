@@ -1,34 +1,94 @@
 import rodados.*
 
-describe "test rodados" {
+describe "test de rodados" {
 
-    const deportes = new Dependencia(empleados = 45)
-    const cultura = new Dependencia(empleados = 31)
-    const cachito = new Corsa(color = "rojo")
-
-    method initialize() {
-        deportes.agregarAFlota(cachito)
-        deportes.agregarAFlota(new Corsa(color="azul"))
-        deportes.agregarAFlota(new Corsa(color="verde"))
-        deportes.agregarAFlota(new Kwid(tieneTanqueAdicional= true))
-        deportes.agregarAFlota(new Especial(capacidad=9, velocidadMaxima =30, peso =78, color ="verde"))
-        cultura.agregarAFlota(cachito)
-    }
-
-  test "deportes tiene peso total 6450" {
-    assert.equals(1300+1300+1300+1350, deportes.pesoTotalFlota())
+  const deportes = new Dependencia(empleados=45)
+  const cultura  = new Dependencia(empleados=31)
+  const cachito  = new Corsa(color="rojo")
+  const pedido1  = new Pedido(distanciaARecorrer=960,tiempoMaximo=8,pasajeros=4,coloresIncompatibles=#{"azul","negro"})
+  const pedido2  = new Pedido(distanciaARecorrer=960,tiempoMaximo=5,pasajeros=4,coloresIncompatibles=#{"azul","negro"})
+  
+  method initialize() {
+    deportes.agregarAFlota(cachito)
+    deportes.agregarAFlota(new Corsa(color="azul"))
+    deportes.agregarAFlota(new Corsa(color="verde"))
+    deportes.agregarAFlota(new Kwid(tieneTanqueAdicional=true))
+    deportes.agregarAFlota(new Especial(capacidad=5,velocidadMaxima=160,peso=1200,color="beige"))
+    cultura.agregarAFlota(cachito)
+    cultura.agregarAFlota(new Kwid(tieneTanqueAdicional=true))
+    cultura.agregarAFlota(new Kwid(tieneTanqueAdicional=true))
+    cultura.agregarAFlota(new Kwid(tieneTanqueAdicional=false))
+    cultura.agregarAFlota(trafic)
+    trafic.interior(popular)
+    trafic.motor(bataton)
+    deportes.agregarPedido(pedido1)
+    deportes.agregarPedido(pedido2)
   }
-  test "cultura peso total 10700" {
-    assert.equals(0, cultura.pesoTotalFlota())
+  test "deportes tiene peso total 6450" {
+    assert.equals(1300+1300+1300+1350+1200,deportes.pesoTotalFlota())
+  }
+
+  test "cultura tiene peso total 10700" {
+    assert.equals(1300+1350+1350+1200+5500,cultura.pesoTotalFlota())
   }
 
   test "la flota de deportes esta bien equipada" {
     assert.that(deportes.estaBienEquipada())
   }
+
   test "la flota de cultura no esta bien equipada" {
     assert.notThat(cultura.estaBienEquipada())
   }
-  test "la capacidad total en color azul de deportes" {
-    assert.equals(7, deportes.capacidadTotalEnColor("azul"))
+
+  test "la capacidad total en color azul de deportes es 7" {
+    assert.equals(7,deportes.capacidadTotalEnColor("azul"))
   }
+
+  test"el total de pasajeros de los pedidos"{
+    assert.equals(8 , deportes.totalPasajerosEnPedidos())
+  }
+
+ test"el conjunto con el pedido2 no puede responder"{
+    assert.equals(#{pedido2} ,deportes.pedidosNoPuedenSerSatisfechos())
+  }
+  test "el pedido1 puede ser satisfecho por 1 rodado"{
+    assert.that(deportes.hayAlgunRodadoQueSatisfaceUnPedido(pedido1))
+  }
+  test "el pedido2 no puede ser satisfecho por ningún rodado"{
+    assert.notThat(deportes.hayAlgunRodadoQueSatisfaceUnPedido(pedido2))
+  }
+  test "todos los pedidos tienen el color azul como color incompatible"{
+    assert.that(deportes.todosLosPedidosTienenIncompatible("azul"))
+  }
+    test "todos los pedidos tienen el color rojo como color incompatible"{
+    assert.notThat(deportes.todosLosPedidosTienenIncompatible("rojo"))
+  }
+}
+
+
+
+
+//////
+
+//pedidos.wtest
+import rodados.*
+describe "Test de pedidos" {
+
+    const cachito = new Corsa(color="rojo")
+    const pedido1 = new Pedido(distanciaARecorrer=960,tiempoMaximo=8,pasajeros=4,coloresIncompatibles=#{"azul","negro"}) 
+
+  
+    test "cachito puede satisfacer pedido1" {
+        assert.that(pedido1.puedeSatisfacer(cachito))
+    }
+    test "cachito no puede satisfacer pedido1 si se agrega rojo" {
+        pedido1.agregarColorIncompatible("rojo")
+        assert.notThat(pedido1.puedeSatisfacer(cachito))
+    }
+    test "cachito no puede satisfacer pedido1 si el tiempo maximo es 6" {
+        pedido1.acelerar()
+        pedido1.acelerar()
+        assert.notThat(pedido1.puedeSatisfacer(cachito))
+    }
+
 }
